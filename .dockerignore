@@ -21,3 +21,28 @@ frontend/dist
 frontend/.vite
 
 backend/uploads
+
+# Never send local research, credentials or browser evidence to a build context.
+.env.*
+!.env.example
+!.env.simlab.example
+.run
+backend/logs
+backend/test-artifacts
+knowledge-base
+private
+secrets
+credentials
+.codex
+.auth
+**/auth.json
+**/credentials.json
+**/storage-state*.json
+**/storage_state*.json
+**/session.json
+**/*.pem
+**/*.key
+**/*.sqlite*
+**/*.db
+**/*.trace.zip
+scan-results

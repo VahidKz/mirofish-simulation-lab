@@ -1,3 +1,4 @@
+/* Modified 2026-10-29 for the independent Simulation Lab edition; see NOTICE and MODIFICATIONS.md. */
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import Process from '../views/MainView.vue'
@@ -7,6 +8,7 @@ import ReportView from '../views/ReportView.vue'
 import InteractionView from '../views/InteractionView.vue'
 
 const routes = [
+  { path: '/simlab', name: 'SimulationLab', component: () => import('../views/SimulationLab.vue') },
   {
     path: '/',
     name: 'Home',

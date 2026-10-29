@@ -1,3 +1,4 @@
+# Modified 2026-10-29 for the independent Simulation Lab edition; see NOTICE and MODIFICATIONS.md.
 """
 File Parser Utility
 Supports text extraction from PDF, Markdown, TXT files
@@ -61,7 +62,7 @@ def _read_text_with_fallback(file_path: str) -> str:
 class FileParser:
     """File Parser"""
 
-    SUPPORTED_EXTENSIONS = {'.pdf', '.md', '.markdown', '.txt'}
+    SUPPORTED_EXTENSIONS = {'.pdf', '.md', '.markdown', '.txt', '.html', '.htm'}
 
     @classmethod
     def extract_text(cls, file_path: str) -> str:
@@ -84,6 +85,9 @@ class FileParser:
         if suffix not in cls.SUPPORTED_EXTENSIONS:
             raise ValueError(f"Unsupported file format: {suffix}")
 
+        if suffix in {'.html', '.htm'}:
+            from ..simlab.ingestion import ingest_files, to_markdown
+            return to_markdown(ingest_files({path.name: path.read_bytes()}, render=False))
         if suffix == '.pdf':
             return cls._extract_from_pdf(file_path)
         elif suffix in {'.md', '.markdown'}:

@@ -1,0 +1,24 @@
+{
+  "seeded-staging": {
+    "name": "Example ONLY — replace with inspected authorized staging routes",
+    "kind": "staging",
+    "origin": "https://staging.example.com",
+    "interactive_authorized": true,
+    "seeded_test_data_only": true,
+    "sandbox_services_confirmed": true,
+    "login_authorized": false,
+    "entries": { "buyer": "/test-catalog" },
+    "read_paths": ["/test-catalog", "/test-product", "/test-cart", "/test-checkout", "/assets/app.js", "/assets/app.css"],
+    "query_keys": ["category", "sort", "page"],
+    "mock_routes": { "POST /sandbox-checkout": { "mock": true, "test_only": true } },
+    "checkpoints": {
+      "buyer": {
+        "plp": "[data-testid=seeded-catalog]",
+        "filter_sort": "[data-testid=filters-applied]",
+        "pdp": "[data-testid=seeded-product]",
+        "cart": "[data-testid=test-cart]",
+        "test_checkout": "[data-testid=mock-checkout-confirmation]"
+      }
+    }
+  }
+}

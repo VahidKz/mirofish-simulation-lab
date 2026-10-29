@@ -35,3 +35,11 @@ python-dotenv>=1.0.0
 
 # 数据验证
 pydantic>=2.0.0
+
+# SimLab local lab additions (official SDK includes matching runtime)
+openai-codex==0.163.0
+beautifulsoup4>=4.12,<5
+playwright==1.64.1
+jsonschema>=4.20,<5
+# CAMEL 0.2.78 imports FastMCP from the MCP v1 surface.
+mcp>=1.12,<2

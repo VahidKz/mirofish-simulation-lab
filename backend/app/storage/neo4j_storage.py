@@ -1,3 +1,4 @@
+# Modified 2026-10-29 for the independent Simulation Lab edition; see NOTICE and MODIFICATIONS.md.
 """
 Neo4jStorage — Neo4j Community Edition implementation of GraphStorage.
 
@@ -283,7 +284,7 @@ class Neo4jStorage(GraphStorage):
                     try:
                         def _add_label(tx, _name_lower=ename.lower()):
                             tx.run(
-                                f"MATCH (n:Entity {{graph_id: $gid, name_lower: $nl}}) SET n:`{etype}`",
+                                f"MATCH (n:Entity {{graph_id: $gid, name_lower: $nl}}) SET n:`{etype.replace(chr(96), chr(96)*2)}`",
                                 gid=graph_id,
                                 nl=_name_lower,
                             )
@@ -439,9 +440,9 @@ class Neo4jStorage(GraphStorage):
 
     def get_nodes_by_label(self, graph_id: str, label: str) -> List[Dict[str, Any]]:
         def _read(tx):
-            # Dynamic label in query (safe — label comes from ontology, not user input)
+            # Ontology labels are model-generated: escape Cypher identifier delimiters.
             query = f"""
-                MATCH (n:Entity:`{label}` {{graph_id: $gid}})
+                MATCH (n:Entity:`{label.replace(chr(96), chr(96)*2)}` {{graph_id: $gid}})
                 RETURN n, labels(n) AS labels
             """
             result = tx.run(query, gid=graph_id)

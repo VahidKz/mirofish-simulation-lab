@@ -1,3 +1,4 @@
+# Modified 2026-10-29 for the independent Simulation Lab edition; see NOTICE and MODIFICATIONS.md.
 """
 EmbeddingService — local embedding via Ollama API
 
@@ -29,6 +30,8 @@ class EmbeddingService:
     ):
         self.model = model or Config.EMBEDDING_MODEL
         self.base_url = (base_url or Config.EMBEDDING_BASE_URL).rstrip('/')
+        from ..simlab.provider import local_url
+        local_url(self.base_url)
         self.max_retries = max_retries
         self.timeout = timeout
         self._embed_url = f"{self.base_url}/api/embed"

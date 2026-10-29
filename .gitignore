@@ -59,3 +59,32 @@ backend/uploads/
 # Docker 数据
 data/backend/venv311/
 backend/venv311/
+
+# Local SimLab process IDs and browser evidence
+.run/
+backend/test-artifacts/
+
+# Public-release boundary: operational/user research data must stay local.
+.env.*
+!.env.example
+!.env.simlab.example
+/knowledge-base/
+/private/
+/secrets/
+/credentials/
+/.codex/
+/.auth/
+**/auth.json
+**/credentials.json
+**/storage-state*.json
+**/storage_state*.json
+**/session.json
+*.pem
+*.key
+*.p12
+*.pfx
+*.sqlite
+*.sqlite3
+*.db
+*.trace.zip
+/scan-results/

@@ -1,3 +1,4 @@
+# Modified 2026-10-29 for the independent Simulation Lab edition; see NOTICE and MODIFICATIONS.md.
 """
 MiroFish Backend - Flask Application Factory
 """
@@ -40,7 +41,7 @@ def create_app(config_class=Config):
         logger.info("=" * 50)
 
     # Enable CORS
-    CORS(app, resources={r"/api/*": {"origins": "*"}})
+    CORS(app, resources={r"/api/*": {"origins": ["http://localhost:3000", "http://127.0.0.1:3000"]}})
 
     # --- Initialize Neo4jStorage singleton (DI via app.extensions) ---
     from .storage import Neo4jStorage
@@ -60,13 +61,26 @@ def create_app(config_class=Config):
     if should_log_startup:
         logger.info("Simulation process cleanup function registered")
 
+    from .simlab.api import bp as simlab_bp
+    app.register_blueprint(simlab_bp, url_prefix='/api/simlab')
+    from .simlab.journeys.api import bp as journeys_bp
+    app.register_blueprint(journeys_bp, url_prefix='/api/simlab/journeys')
+
+    @app.before_request
+    def local_access_only():
+        from urllib.parse import urlparse
+        if request.host.split(':')[0] not in {'localhost', '127.0.0.1'}:
+            return {'success': False, 'error': 'This lab accepts localhost requests only.'}, 403
+        origin = request.headers.get('Origin')
+        if origin and origin not in {'http://localhost:3000', 'http://127.0.0.1:3000',
+                                      'http://localhost:5001', 'http://127.0.0.1:5001'}:
+            return {'success': False, 'error': 'Cross-origin access is blocked for the local lab.'}, 403
+
     # Request logging middleware
     @app.before_request
     def log_request():
         logger = get_logger('mirofish.request')
         logger.debug(f"Request: {request.method} {request.path}")
-        if request.content_type and 'json' in request.content_type:
-            logger.debug(f"Request body: {request.get_json(silent=True)}")
 
     @app.after_request
     def log_response(response):

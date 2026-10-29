@@ -337,7 +337,7 @@ button {
   gap: 8px;
 }
 
-.diamond-icon {
+.collectible-icon {
   font-size: 1.2rem;
   line-height: 1;
 }

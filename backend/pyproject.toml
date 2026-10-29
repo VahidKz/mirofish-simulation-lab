@@ -9,6 +9,13 @@ authors = [
 ]
 
 dependencies = [
+    "openai-codex==0.163.0",
+    "beautifulsoup4>=4.12,<5",
+    "playwright==1.64.1",
+    "jsonschema>=4.20,<5",
+    "mcp>=1.12,<2",
+    "requests>=2.28.0",
+    "torch>=2.6.0",
     # 核心框架
     "flask>=3.0.0",
     "flask-cors>=6.0.0",
@@ -53,3 +60,12 @@ dev = [
 
 [tool.hatch.build.targets.wheel]
 packages = ["app"]
+
+# Keep the native Linux/WSL setup on CPU wheels, including uv sync.
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux' and platform_machine == 'x86_64'" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true

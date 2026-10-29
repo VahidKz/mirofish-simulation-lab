@@ -1,3 +1,4 @@
+# Modified 2026-10-29 for the independent Simulation Lab edition; see NOTICE and MODIFICATIONS.md.
 """
 Simulation Configuration Intelligent Generator
 Use LLM to automatically generate detailed simulation parameters based on simulation requirements, document content, and knowledge graph information
@@ -16,7 +17,7 @@ from typing import Dict, Any, List, Optional, Callable
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
 
-from openai import OpenAI
+from ..simlab.provider import CompletionFacade, ProviderError
 
 from ..config import Config
 from ..utils.logger import get_logger
@@ -231,13 +232,7 @@ class SimulationConfigGenerator:
         self.base_url = base_url or Config.LLM_BASE_URL
         self.model_name = model_name or Config.LLM_MODEL_NAME
 
-        if not self.api_key:
-            raise ValueError("LLM_API_KEY not configured")
-
-        self.client = OpenAI(
-            api_key=self.api_key,
-            base_url=self.base_url
-        )
+        self.client = CompletionFacade()
     
     def generate_config(
         self,
@@ -472,6 +467,8 @@ class SimulationConfigGenerator:
                     last_error = e
 
             except Exception as e:
+                if isinstance(e, ProviderError):
+                    raise
                 logger.warning(f"LLM call failed (attempt {attempt+1}): {str(e)[:80]}")
                 last_error = e
                 import time
@@ -589,6 +586,8 @@ Field description:
         try:
             return self._call_llm_with_retry(prompt, system_prompt)
         except Exception as e:
+            if isinstance(e, ProviderError):
+                raise
             logger.warning(f"Time config LLM generation failed: {e}, using default configuration")
             return self._get_default_time_config(num_entities)
     
@@ -705,6 +704,8 @@ Return JSON format (no markdown):
         try:
             return self._call_llm_with_retry(prompt, system_prompt)
         except Exception as e:
+            if isinstance(e, ProviderError):
+                raise
             logger.warning(f"Event config LLM generation failed: {e}, using default configuration")
             return {
                 "hot_topics": [],
@@ -869,6 +870,8 @@ Return JSON format (no markdown):
             result = self._call_llm_with_retry(prompt, system_prompt)
             llm_configs = {cfg["agent_id"]: cfg for cfg in result.get("agent_configs", [])}
         except Exception as e:
+            if isinstance(e, ProviderError):
+                raise
             logger.warning(f"Agent config batch LLM generation failed: {e}, using rule-based generation")
             llm_configs = {}
 

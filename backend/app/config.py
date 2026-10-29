@@ -1,3 +1,4 @@
+# Modified 2026-10-29 for the independent Simulation Lab edition; see NOTICE and MODIFICATIONS.md.
 """
 Configuration Management
 Loads configuration from .env file in project root directory
@@ -11,10 +12,10 @@ from dotenv import load_dotenv
 project_root_env = os.path.join(os.path.dirname(__file__), '../../.env')
 
 if os.path.exists(project_root_env):
-    load_dotenv(project_root_env, override=True)
+    load_dotenv(project_root_env, override=False)
 else:
     # If no .env in root, try to load environment variables (for production)
-    load_dotenv(override=True)
+    load_dotenv(override=False)
 
 
 class Config:
@@ -22,7 +23,7 @@ class Config:
 
     # Flask configuration
     SECRET_KEY = os.environ.get('SECRET_KEY', 'mirofish-secret-key')
-    DEBUG = os.environ.get('FLASK_DEBUG', 'True').lower() == 'true'
+    DEBUG = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
 
     # JSON configuration - disable ASCII escaping to display Chinese directly (not as \uXXXX)
     JSON_AS_ASCII = False
@@ -44,7 +45,7 @@ class Config:
     # File upload configuration
     MAX_CONTENT_LENGTH = 50 * 1024 * 1024  # 50MB
     UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), '../uploads')
-    ALLOWED_EXTENSIONS = {'pdf', 'md', 'txt', 'markdown'}
+    ALLOWED_EXTENSIONS = {'pdf', 'md', 'txt', 'markdown', 'html', 'htm'}
 
     # Text processing configuration
     DEFAULT_CHUNK_SIZE = 500  # Default chunk size
@@ -73,8 +74,8 @@ class Config:
     def validate(cls):
         """Validate required configuration"""
         errors = []
-        if not cls.LLM_API_KEY:
-            errors.append("LLM_API_KEY not configured (set to any non-empty value, e.g. 'ollama')")
+        if os.getenv('MODEL_PROVIDER', 'codex') not in {'codex', 'ollama'}:
+            errors.append('MODEL_PROVIDER must be codex or local ollama')
         if not cls.NEO4J_URI:
             errors.append("NEO4J_URI not configured")
         if not cls.NEO4J_PASSWORD:

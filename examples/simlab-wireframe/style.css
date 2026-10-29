@@ -1,0 +1,2 @@
+/* Modified 2026-10-29 for the independent Simulation Lab edition; see NOTICE and MODIFICATIONS.md. */
+body{font:16px/1.6 system-ui;background:#f5f5ef;color:#253220;margin:0}header,main{max-width:900px;margin:auto;padding:24px}header{display:flex;justify-content:space-between}nav a{margin-left:20px}article,section{padding:24px;background:white;margin:20px 0}button,input,select{padding:12px;margin:8px}a{color:#455d36}label{display:block}

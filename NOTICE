@@ -1,0 +1,20 @@
+MiroFish Simulation Lab — modified edition, 2026-10-29
+
+This repository contains a modified version of MiroFish-Offline:
+https://github.com/nikmcfly/MiroFish-Offline
+Foundation commit: 313fe64
+
+MiroFish-Offline derives from MiroFish by 666ghj:
+https://github.com/666ghj/MiroFish
+The upstream README credits original support from Shanda Group.
+
+The original GNU Affero General Public License, Version 3, is retained in LICENSE.
+Upstream copyright and license notices in source files remain intact.
+Changes made for this edition are described and dated in MODIFICATIONS.md.
+
+OASIS and CAMEL provide separately installed agent simulation components.
+Dependency licenses are listed in THIRD_PARTY_NOTICES.md; they are not relicensed.
+Product names and marks do not imply affiliation, endorsement or ownership.
+
+No private product-development corpus, customer audit, credential, login session,
+collected wireframe or operational database is distributed in this public edition.

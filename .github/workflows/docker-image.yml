@@ -1,8 +1,7 @@
+# Modified 2026-10-29 for the independent Simulation Lab edition; see NOTICE and MODIFICATIONS.md.
 name: Build and push Docker image
 
 on:
-  push:
-    tags: ["*"]
   workflow_dispatch:
 
 permissions:

@@ -1,3 +1,4 @@
+# Modified 2026-10-29 for the independent Simulation Lab edition; see NOTICE and MODIFICATIONS.md.
 """
 OASIS dual-platform parallel simulation preset script
 Run Twitter and Reddit simulations simultaneously with the same configuration file
@@ -63,6 +64,8 @@ if sys.platform == 'win32':
                               newline, closefd, opener)
 
     builtins.open = _utf8_open
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import argparse
 import asyncio
@@ -982,59 +985,8 @@ def _get_comment_info(
 
 
 def create_model(config: Dict[str, Any], use_boost: bool = False):
-    """
-    Create LLM model
-    
-    Support dual LLM configuration for acceleration during parallel simulation：
-    - Common configuration：LLM_API_KEY, LLM_BASE_URL, LLM_MODEL_NAME
-    - Acceleration configuration (optional)：LLM_BOOST_API_KEY, LLM_BOOST_BASE_URL, LLM_BOOST_MODEL_NAME
-    
-    If acceleration LLM is configured, different platforms can use different API providers during parallel simulation to improve concurrency.
-    
-    Args:
-        config: Simulation configuration dictionary
-        use_boost: Whether to use acceleration LLM configuration (if available)
-    """
-    # Check if acceleration configuration exists
-    boost_api_key = os.environ.get("LLM_BOOST_API_KEY", "")
-    boost_base_url = os.environ.get("LLM_BOOST_BASE_URL", "")
-    boost_model = os.environ.get("LLM_BOOST_MODEL_NAME", "")
-    has_boost_config = bool(boost_api_key)
-    
-    # Choose which LLM to use based on parameters and configuration
-    if use_boost and has_boost_config:
-        # Use acceleration configuration
-        llm_api_key = boost_api_key
-        llm_base_url = boost_base_url
-        llm_model = boost_model or os.environ.get("LLM_MODEL_NAME", "")
-        config_label = "[Acceleration LLM]"
-    else:
-        # useCommon configuration
-        llm_api_key = os.environ.get("LLM_API_KEY", "")
-        llm_base_url = os.environ.get("LLM_BASE_URL", "")
-        llm_model = os.environ.get("LLM_MODEL_NAME", "")
-        config_label = "[Common LLM]"
-    
-    # If model name is not in .env, use config as fallback
-    if not llm_model:
-        llm_model = config.get("llm_model", "gpt-4o-mini")
-    
-    # Set environment variables required by camel-ai
-    if llm_api_key:
-        os.environ["OPENAI_API_KEY"] = llm_api_key
-    
-    if not os.environ.get("OPENAI_API_KEY"):
-        raise ValueError("Missing API Key configuration, please set LLM_API_KEY in .env file in project root")
-    
-    if llm_base_url:
-        os.environ["OPENAI_API_BASE_URL"] = llm_base_url
-    
-    print(f"{config_label} model={llm_model}, base_url={llm_base_url[:40] if llm_base_url else 'default'}...")
-    
-    return ModelFactory.create(
-        model_platform=ModelPlatformType.OPENAI,
-        model_type=llm_model,
-    )
+    from app.simlab.camel_adapter import create_simulation_model
+    return create_simulation_model()
 
 
 def get_active_agents_for_round(
@@ -1156,7 +1108,7 @@ async def run_twitter_simulation(
         agent_graph=result.agent_graph,
         platform=oasis.DefaultPlatformType.TWITTER,
         database_path=db_path,
-        semaphore=30,  # Limit maximum concurrent LLM requests to prevent API overload
+        semaphore=1,  # Limit maximum concurrent LLM requests to prevent API overload
     )
     
     await result.env.reset()
@@ -1347,7 +1299,7 @@ async def run_reddit_simulation(
         agent_graph=result.agent_graph,
         platform=oasis.DefaultPlatformType.REDDIT,
         database_path=db_path,
-        semaphore=30,  # Limit maximum concurrent LLM requests to prevent API overload
+        semaphore=1,  # Limit maximum concurrent LLM requests to prevent API overload
     )
     
     await result.env.reset()

@@ -1,3 +1,4 @@
+# Modified 2026-10-29 for the independent Simulation Lab edition; see NOTICE and MODIFICATIONS.md.
 """
 OASIS Simulation Runner
 Run simulations in the background and record actions for each Agent, supporting real-time status monitoring
@@ -432,6 +433,7 @@ class SimulationRunner:
             # Set subprocess environment variables to ensure UTF-8 encoding on Windows
             # This fixes third-party libraries (like OASIS) not specifying encoding when reading files
             env = os.environ.copy()
+            env['SIMLAB_RUN_ID'] = 'legacy-' + simulation_id
             env['PYTHONUTF8'] = '1'  # Python 3.7+ support, make all open() use UTF-8 by default
             env['PYTHONIOENCODING'] = 'utf-8'  # Ensure stdout/stderr use UTF-8
             

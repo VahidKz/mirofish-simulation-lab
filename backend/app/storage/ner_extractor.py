@@ -1,3 +1,4 @@
+# Modified 2026-10-29 for the independent Simulation Lab edition; see NOTICE and MODIFICATIONS.md.
 """
 NER/RE Extractor — entity and relation extraction via local LLM
 
@@ -10,6 +11,7 @@ import logging
 from typing import Dict, Any, List, Optional
 
 from ..utils.llm_client import LLMClient
+from ..simlab.provider import ProviderError
 
 logger = logging.getLogger('mirofish.ner_extractor')
 
@@ -93,6 +95,8 @@ class NERExtractor:
                     f"NER extraction failed (attempt {attempt + 1}): invalid JSON — {e}"
                 )
             except Exception as e:
+                if isinstance(e, ProviderError):
+                    raise
                 last_error = e
                 logger.error(f"NER extraction error: {e}")
                 if attempt >= self.max_retries:

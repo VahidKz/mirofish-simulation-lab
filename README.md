@@ -1,205 +1,82 @@
-<div align="center">
+# MiroFish Simulation Lab
 
-<img src="./static/image/mirofish-offline-banner.png" alt="MiroFish Offline" width="100%"/>
+A modified, local-workstation research edition of [MiroFish-Offline](https://github.com/nikmcfly/MiroFish-Offline), which derives from [MiroFish](https://github.com/666ghj/MiroFish). Includes a bounded multi-agent lab, an independent browser journey runner, and reusable source-evidence tooling.
 
-# MiroFish-Offline
+**Modified edition dated 29 October 2026.** Distributed under the existing [GNU AGPL-3.0 license](LICENSE). See [NOTICE](NOTICE) and [MODIFICATIONS.md](MODIFICATIONS.md) for attribution and changes. This is an independent fork; upstream authors and service providers do not endorse its results.
 
-**Fully local fork of [MiroFish](https://github.com/666ghj/MiroFish) — no cloud APIs required. English UI.**
+## What is included
 
-*A multi-agent swarm intelligence engine that simulates public opinion, market sentiment, and social dynamics. Entirely on your hardware.*
+- Original graph and OASIS/CAMEL simulation components, with Neo4j and Ollama embeddings.
+- A `/simlab` research dashboard for small hypothetical scenario comparisons, saved records and reports. Examples use invented research policies and personas; no customer brand or product specification is distributed.
+- An authenticated Codex provider and native CAMEL action adapter, persistent SQLite model-turn budgets, a shared inference lock and no paid API fallback. Using Codex consumes the signed-in account's usage and sends prompts to OpenAI. It is **not fully offline**. Ollama inference is a separately selected local alternative.
+- A separate Playwright journey runner with isolated contexts, bounded actions, evidence capture and explicit target permissions. Generated examples verify the tool, not any company's service.
+- Read-only material import, source provenance and conflict-aware references. No customer wireframes, collected knowledge base, private policies, audit reports or CEO presentation are included.
+- An optional private-case adapter. Its roles, five phases and evidence must be explicitly supplied by the operator; the case template is hidden until configured. No real case is distributed.
 
-[![GitHub Stars](https://img.shields.io/github/stars/nikmcfly/MiroFish-Offline?style=flat-square&color=DAA520)](https://github.com/nikmcfly/MiroFish-Offline/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/nikmcfly/MiroFish-Offline?style=flat-square)](https://github.com/nikmcfly/MiroFish-Offline/network)
-[![Docker](https://img.shields.io/badge/Docker-Build-2496ED?style=flat-square&logo=docker&logoColor=white)](https://hub.docker.com/)
-[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue?style=flat-square)](./LICENSE)
+A completed synthetic discussion or checkpoint is not a purchase, payout, customer conversion metric or validated prediction of human behavior.
 
-</div>
+## Quick start
 
-## What is this?
-
-MiroFish is a multi-agent simulation engine: upload any document (press release, policy draft, financial report), and it generates hundreds of AI agents with unique personalities that simulate the public reaction on social media. Posts, arguments, opinion shifts — hour by hour.
-
-The [original MiroFish](https://github.com/666ghj/MiroFish) was built for the Chinese market (Chinese UI, Zep Cloud for knowledge graphs, DashScope API). This fork makes it **fully local and fully English**:
-
-| Original MiroFish | MiroFish-Offline |
-|---|---|
-| Chinese UI | **English UI** (1,000+ strings translated) |
-| Zep Cloud (graph memory) | **Neo4j Community Edition 5.15** |
-| DashScope / OpenAI API (LLM) | **Ollama** (qwen2.5, llama3, etc.) |
-| Zep Cloud embeddings | **nomic-embed-text** via Ollama |
-| Cloud API keys required | **Zero cloud dependencies** |
-
-## Workflow
-
-1. **Graph Build** — Extracts entities (people, companies, events) and relationships from your document. Builds a knowledge graph with individual and group memory via Neo4j.
-2. **Env Setup** — Generates hundreds of agent personas, each with unique personality, opinion bias, reaction speed, influence level, and memory of past events.
-3. **Simulation** — Agents interact on simulated social platforms: posting, replying, arguing, shifting opinions. The system tracks sentiment evolution, topic propagation, and influence dynamics in real time.
-4. **Report** — A ReportAgent analyzes the post-simulation environment, interviews a focus group of agents, searches the knowledge graph for evidence, and generates a structured analysis.
-5. **Interaction** — Chat with any agent from the simulated world. Ask them why they posted what they posted. Full memory and personality persists.
-
-## Screenshot
-
-<div align="center">
-<img src="./static/image/mirofish-offline-screenshot.jpg" alt="MiroFish Offline — English UI" width="100%"/>
-</div>
-
-## Quick Start
-
-### Prerequisites
-
-- Docker & Docker Compose (recommended), **or**
-- Python 3.11+, Node.js 18+, Neo4j 5.15+, Ollama
-
-### Option A: Docker (easiest)
+Use Python 3.11, Node.js with npm, Docker Compose and `uv`. The tested helper targets Linux/WSL x86_64 with CPU PyTorch wheels; see its script for other-platform handling.
 
 ```bash
-git clone https://github.com/nikmcfly/MiroFish-Offline.git
-cd MiroFish-Offline
-cp .env.example .env
-
-# Start all services (Neo4j, Ollama, MiroFish)
-docker compose up -d
-
-# Pull the required models into Ollama
-docker exec mirofish-ollama ollama pull qwen2.5:32b
-docker exec mirofish-ollama ollama pull nomic-embed-text
+git clone https://github.com/VahidKz/mirofish-simulation-lab.git
+cd mirofish-simulation-lab
+./scripts/simlab-local.sh setup
+./scripts/simlab-local.sh start
 ```
 
-Open `http://localhost:3000` — that's it.
+The helper creates a private `.env` with a generated local database password, installs locked dependencies and Chromium, starts Neo4j/Ollama, and pulls the local embedding model. Initial downloads require network access. Existing `.env` files are not overwritten.
 
-### Option B: Manual
-
-**1. Start Neo4j**
+Open <http://localhost:3000/simlab>. The original interface remains at <http://localhost:3000/>. The helper binds to loopback and is intended for a trusted workstation, not an Internet-facing multi-tenant service.
 
 ```bash
-docker run -d --name neo4j \
-  -p 7474:7474 -p 7687:7687 \
-  -e NEO4J_AUTH=neo4j/mirofish \
-  neo4j:5.15-community
+./scripts/simlab-local.sh status
+./scripts/simlab-local.sh stop
 ```
 
-**2. Start Ollama & pull models**
+Review `.env.simlab.example` before running inference. Codex uses the supported installed client's existing ChatGPT authentication; authentication files are never bundled. No API key is required for that path. Set `MODEL_PROVIDER=ollama` only when explicitly choosing the local model alternative. No automatic provider fallback is enabled. Do not assume a subscription includes unlimited usage or that a model is available to your account.
+
+## Zero-inference browser check
 
 ```bash
-ollama serve &
-ollama pull qwen2.5:32b      # LLM (or qwen2.5:14b for less VRAM)
-ollama pull nomic-embed-text  # Embeddings (768d)
+PYTHONPATH=backend .venv/bin/python backend/scripts/simlab_journey.py --template buyer
 ```
 
-**3. Configure & run backend**
+Other synthetic examples use `--template seller_offer` and `--template merchant`. Each uses isolated local sample pages, not collected product evidence. The CLI exits 0 for all configured checkpoints and 2 for bounded partial/failure results. See [browser journey setup](JOURNEY_SETUP.md).
+
+## Small model-driven social run
 
 ```bash
-cp .env.example .env
-# Edit .env if your Neo4j/Ollama are on non-default ports
-
-cd backend
-pip install -r requirements.txt
-python run.py
+PYTHONPATH=backend .venv/bin/python backend/scripts/simlab_smoke.py
 ```
 
-**4. Run frontend**
+This is **opt-in inference** through your configured provider, not a free/no-model test. It creates a synthetic three-agent experiment with the existing hard cap. Review the dashboard's estimate, server cap and provider settings first. Source evidence is untrusted data, never authorization for real-world actions.
+
+## Private case definitions and research materials
+
+The source-evidence tool accepts your own authorized files. Store originals, collected text, source catalogs and reports outside version control. Its expected local schemas and optional five-phase case adapter are described in [private case setup](PRIVATE_CASE_SETUP.md). Do not commit identity documents, payment data, login state or customer records.
+
+The `SIMLAB_KNOWLEDGE_HOST` passive collector is disabled by default. An explicit public host enables bounded GET-only public-document collection; it never grants interactive automation. Interactive production targets remain prohibited. Staging login requires a separate explicit grant and a deliberately provided seeded session.
+
+## Verification without inference
 
 ```bash
-cd frontend
-npm install
-npm run dev
+PYTHONPATH=backend .venv/bin/python -m pytest backend/tests backend/scripts/test_profile_format.py -q
+.venv/bin/python -m compileall -q backend/app backend/scripts
+npm --prefix frontend run build
+python3 scripts/check-public-release.py
 ```
 
-Open `http://localhost:3000`.
+Tests replace model responses with deterministic test doubles and use local fixtures. Release checks inspect the actual Git candidate tree, reject runtime/private files and require the original license. Run the independent secret scanner described in [PUBLIC_RELEASE.md](PUBLIC_RELEASE.md) before pushing.
 
-## Configuration
+## License and credits
 
-All settings are in `.env` (copy from `.env.example`):
+- Original MiroFish: [666ghj/MiroFish](https://github.com/666ghj/MiroFish), by 666ghj, originally supported by Shanda Group.
+- Offline foundation: [nikmcfly/MiroFish-Offline](https://github.com/nikmcfly/MiroFish-Offline), retaining its Neo4j/Ollama migration and English UI work.
+- Agent simulation: [CAMEL-AI OASIS](https://github.com/camel-ai/oasis) and [CAMEL](https://github.com/camel-ai/camel).
+- Browser automation: [Playwright](https://github.com/microsoft/playwright-python). Codex generation uses the separately installed official SDK.
 
-```bash
-# LLM — points to local Ollama (OpenAI-compatible API)
-LLM_API_KEY=ollama
-LLM_BASE_URL=http://localhost:11434/v1
-LLM_MODEL_NAME=qwen2.5:32b
+Keep the AGPL license, upstream notices and modification notices. Distribution of modified source remains under AGPL-3.0; binary/container distribution and remote-network use have corresponding-source obligations under the license. If operating a modified version over a network, provide the applicable source-access offer required by Section 13. Review the [license text](LICENSE), including Sections 5, 6 and 13, for the exact conditions.
 
-# Neo4j
-NEO4J_URI=bolt://localhost:7687
-NEO4J_USER=neo4j
-NEO4J_PASSWORD=mirofish
-
-# Embeddings
-EMBEDDING_MODEL=nomic-embed-text
-EMBEDDING_BASE_URL=http://localhost:11434
-```
-
-Works with any OpenAI-compatible API — swap Ollama for Claude, GPT, or any other provider by changing `LLM_BASE_URL` and `LLM_API_KEY`.
-
-## Architecture
-
-This fork introduces a clean abstraction layer between the application and the graph database:
-
-```
-┌─────────────────────────────────────────┐
-│              Flask API                   │
-│  graph.py  simulation.py  report.py     │
-└──────────────┬──────────────────────────┘
-               │ app.extensions['neo4j_storage']
-┌──────────────▼──────────────────────────┐
-│           Service Layer                  │
-│  EntityReader  GraphToolsService         │
-│  GraphMemoryUpdater  ReportAgent         │
-└──────────────┬──────────────────────────┘
-               │ storage: GraphStorage
-┌──────────────▼──────────────────────────┐
-│         GraphStorage (abstract)          │
-│              │                            │
-│    ┌─────────▼─────────┐                │
-│    │   Neo4jStorage     │                │
-│    │  ┌───────────────┐ │                │
-│    │  │ EmbeddingService│ ← Ollama       │
-│    │  │ NERExtractor   │ ← Ollama LLM   │
-│    │  │ SearchService  │ ← Hybrid search │
-│    │  └───────────────┘ │                │
-│    └───────────────────┘                │
-└─────────────────────────────────────────┘
-               │
-        ┌──────▼──────┐
-        │  Neo4j CE   │
-        │  5.15       │
-        └─────────────┘
-```
-
-**Key design decisions:**
-
-- `GraphStorage` is an abstract interface — swap Neo4j for any other graph DB by implementing one class
-- Dependency injection via Flask `app.extensions` — no global singletons
-- Hybrid search: 0.7 × vector similarity + 0.3 × BM25 keyword search
-- Synchronous NER/RE extraction via local LLM (replaces Zep's async episodes)
-- All original dataclasses and LLM tools (InsightForge, Panorama, Agent Interviews) preserved
-
-## Hardware Requirements
-
-| Component | Minimum | Recommended |
-|---|---|---|
-| RAM | 16 GB | 32 GB |
-| VRAM (GPU) | 10 GB (14b model) | 24 GB (32b model) |
-| Disk | 20 GB | 50 GB |
-| CPU | 4 cores | 8+ cores |
-
-CPU-only mode works but is significantly slower for LLM inference. For lighter setups, use `qwen2.5:14b` or `qwen2.5:7b`.
-
-## Use Cases
-
-- **PR crisis testing** — simulate the public reaction to a press release before publishing
-- **Trading signal generation** — feed financial news and observe simulated market sentiment
-- **Policy impact analysis** — test draft regulations against simulated public response
-- **Creative experiments** — someone fed it a classical Chinese novel with a lost ending; the agents wrote a narratively consistent conclusion
-
-## License
-
-AGPL-3.0 — same as the original MiroFish project. See [LICENSE](./LICENSE).
-
-## Credits & Attribution
-
-This is a modified fork of [MiroFish](https://github.com/666ghj/MiroFish) by [666ghj](https://github.com/666ghj), originally supported by [Shanda Group](https://www.shanda.com/). The simulation engine is powered by [OASIS](https://github.com/camel-ai/oasis) from the CAMEL-AI team.
-
-**Modifications in this fork:**
-- Backend migrated from Zep Cloud to local Neo4j CE 5.15 + Ollama
-- Entire frontend translated from Chinese to English (20 files, 1,000+ strings)
-- All Zep references replaced with Neo4j across the UI
-- Rebranded to MiroFish Offline
+Dependencies and separately obtained services retain their own licenses. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). The historical upstream README is preserved at [docs/UPSTREAM_README.md](docs/UPSTREAM_README.md).
